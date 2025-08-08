@@ -7,7 +7,7 @@ using ProfileExercise.Domain.Entities;
 
 namespace ProfileExercise.Application.Queries;
 
-public record GetAllProfilesQuery(Guid ProfileId) : IRequest<List<ProfileResponseDto>>;
+public record GetAllProfilesQuery : IRequest<List<ProfileResponseDto>>;
 
 internal sealed class GetAllProfilesQueryHandler(IRepository<Profile> profileRepo, INameService nameService)
     : IRequestHandler<GetAllProfilesQuery, List<ProfileResponseDto>>
