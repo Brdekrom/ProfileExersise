@@ -1,8 +1,14 @@
+using MediatR;
+using ProfileExercise.Application.Commands;
+using ProfileExercise.Application.DataTransferObjects;
+using ProfileExercise.Application.Queries;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddApplicationServices();
 
 var app = builder.Build();
 
@@ -10,37 +16,32 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/openapi/v1.json", "v1");
-    });
+
+    app.UseSwaggerUI(options => { options.SwaggerEndpoint("/openapi/v1.json", "v1"); });
 }
 
-app.UseHttpsRedirection();  
+app.UseHttpsRedirection();
 
-var summaries = new[]
+app.MapPost("/profiles", async (IMediator mediator, ProfileDto dto) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    var cmd = new CreateProfileCommand(dto);
+    ProfileResponseDto result = await mediator.Send(cmd);
+    return Results.Created($"/profiles/{result.Profile.Id}", result);
+});
 
-app.MapGet("/weatherforecast", () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast");
+app.MapGet("/profiles", async (IMediator mediator) =>
+{
+    var list = await mediator.Send(new GetAllProfilesQuery());
+    return Results.Ok(list);
+});
+
+app.MapGet("/profiles/{id:guid}", async (IMediator mediator, Guid id) =>
+{
+    var query = new GetProfileByIdQuery(id);
+    ProfileResponseDto? result = await mediator.Send(query);
+    return result is not null
+        ? Results.Ok(result)
+        : Results.NotFound();
+});
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
