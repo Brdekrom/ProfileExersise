@@ -1,0 +1,6 @@
+@ProfileExercise.Api_HostAddress = http://localhost:5244
+
+GET {{ProfileExercise.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
