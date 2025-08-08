@@ -1,0 +1,24 @@
+server {
+    listen       80;
+    listen  [::]:80;
+    server_name  localhost;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Alle statische Angular-bestanden
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Proxy voor API-calls
+    location /api/ {
+        # Vervangen door env-var bij run/build
+        proxy_pass        ${API_URL};
+        proxy_http_version 1.1;
+        proxy_set_header  Host $host;
+        proxy_set_header  X-Real-IP $remote_addr;
+        proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+        rewrite ^/api(/.*)$ $1 break;
+    }
+}
