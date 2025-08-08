@@ -34,6 +34,7 @@ public sealed class Profile : Entity<Guid>
         }
     }
 
+
     public Name FirstName { get; private set; }
     public Name LastName { get; private set; }
     public IReadOnlyCollection<SocialSkill> SocialSkills => _socialSkills.AsReadOnly();
