@@ -5,9 +5,8 @@ namespace ProfileExercise.Domain.Entities;
 
 public sealed class Profile : Entity<Guid>
 {
-    private readonly List<SocialAccount> _socialAccounts;
-
-    private readonly List<SocialSkill> _socialSkills;
+    private readonly List<SocialAccount> _socialAccounts = [];
+    private readonly List<SocialSkill> _socialSkills = [];
 
     public Profile(
         Name firstName,
@@ -16,6 +15,7 @@ public sealed class Profile : Entity<Guid>
         IEnumerable<SocialAccount>? initialAccounts = null
     )
     {
+        Id = Guid.NewGuid();
         FirstName = firstName;
         LastName = lastName;
 
@@ -32,6 +32,11 @@ public sealed class Profile : Entity<Guid>
                 continue;
             _socialAccounts.Add(account);
         }
+    }
+
+    // For EF purposes
+    private Profile()
+    {
     }
 
 

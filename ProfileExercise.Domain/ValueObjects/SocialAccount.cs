@@ -8,11 +8,11 @@ public sealed class SocialAccount : ValueObject
     private static readonly Regex TwitterHandleRegex = new(@"^@[A-Za-z0-9_]{1,15}$", RegexOptions.Compiled);
     private static readonly Regex SnapchatHandleRegex = new(@"^[A-Za-z0-9_.-]{3,15}$", RegexOptions.Compiled);
 
-    public SocialAccount(SocialMediaTypes type, string address)
+    public SocialAccount(SocialMediaTypes socialMediaType, string address)
     {
-        SocialMediaType = type;
+        SocialMediaType = socialMediaType;
 
-        switch (type)
+        switch (socialMediaType)
         {
             case SocialMediaTypes.None:
                 if (!string.IsNullOrWhiteSpace(address))
@@ -86,7 +86,8 @@ public sealed class SocialAccount : ValueObject
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException(nameof(type), $"Unsupported social media type: {type}");
+                throw new ArgumentOutOfRangeException(nameof(socialMediaType),
+                    $"Unsupported social media type: {socialMediaType}");
         }
     }
 

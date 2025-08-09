@@ -9,14 +9,16 @@ namespace ProfileExercise.Application.Queries;
 
 public record GetProfileByIdQuery(Guid ProfileId) : IRequest<ProfileResponseDto>;
 
-internal sealed class GetProfileByIdQueryHandler(IRepository<Profile> profileRepo, INameService nameService)
+internal sealed class GetProfileByIdQueryHandler(IRepository profileRepo, INameService nameService)
     : IRequestHandler<GetProfileByIdQuery, ProfileResponseDto>
 {
     private readonly DbSet<Profile> _profiles = profileRepo.GetDbSet();
 
-    public Task<ProfileResponseDto> Handle(GetProfileByIdQuery request, CancellationToken cancellationToken)
+    public async Task<ProfileResponseDto> Handle(GetProfileByIdQuery request, CancellationToken cancellationToken)
     {
-        var profile = _profiles.FirstOrDefault(p => p.Id == request.ProfileId);
+        var profile = await _profiles
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == request.ProfileId, cancellationToken: cancellationToken);
 
         if (profile == null)
             throw new KeyNotFoundException(
@@ -28,6 +30,6 @@ internal sealed class GetProfileByIdQueryHandler(IRepository<Profile> profileRep
             profile,
             processed);
 
-        return Task.FromResult(dto);
+        return dto;
     }
 }

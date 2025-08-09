@@ -4,8 +4,8 @@ using ProfileExercise.Domain.ValueObjects;
 
 namespace ProfileExercise.Application.DataTransferObjects;
 
-public record ProfileDto(
-    Guid Id,
+public sealed record ProfileDto(
+    string? Id,
     string FirstName,
     string LastName,
     IReadOnlyList<SocialSkillDto> SocialSkills,
@@ -14,23 +14,32 @@ public record ProfileDto(
 {
     public static implicit operator Profile(ProfileDto dto)
     {
+        if (dto is null) throw new ArgumentNullException(nameof(dto));
+
         var firstNameVo = new Name(dto.FirstName);
         var lastNameVo = new Name(dto.LastName);
 
-        var profile = new Profile(firstNameVo, lastNameVo,
-            dto.SocialSkills.Select(s => new SocialSkill(s.Value)),
-            dto.SocialAccounts.Select(a => new SocialAccount(a.Type, a.Address)))
-        {
-            Id = dto.Id
-        };
+        var socialSkills = (dto.SocialSkills ?? Enumerable.Empty<SocialSkillDto>())
+            .Select(s => new SocialSkill(s.Value));
+
+        var socialAccounts = (dto.SocialAccounts ?? Enumerable.Empty<SocialAccountDto>())
+            .Select(a => new SocialAccount(a.Type, a.Address));
+
+        var profile = new Profile(firstNameVo, lastNameVo, socialSkills, socialAccounts);
+
+        if (!string.IsNullOrWhiteSpace(dto.Id) && Guid.TryParse(dto.Id, out var guidId))
+            profile.Id = guidId;
+        else
+            profile.Id = Guid.NewGuid();
 
         return profile;
     }
 
+
     public static implicit operator ProfileDto(Profile profile)
     {
         return new ProfileDto(
-            profile.Id,
+            profile.Id.ToString(),
             profile.FirstName.Value,
             profile.LastName.Value,
             profile.SocialSkills.Select(s => new SocialSkillDto(s.Value)).ToList(),

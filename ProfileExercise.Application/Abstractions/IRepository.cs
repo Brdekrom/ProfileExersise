@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using ProfileExercise.Domain.Abstractions;
+using ProfileExercise.Domain.Entities;
 
 namespace ProfileExercise.Application.Abstractions;
 
-public interface IRepository<T> where T : Entity<Guid>
+public interface IRepository
 {
-    DbSet<T> GetDbSet();
-    Task<int> SaveChangesAsync();
+    DbSet<Profile> GetDbSet();
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

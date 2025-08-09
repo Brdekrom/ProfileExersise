@@ -4,11 +4,13 @@ using ProfileExercise.Application.DataTransferObjects;
 using ProfileExercise.Application.Queries;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.AddServiceDefaults();
+builder.AddAspirePersistenceIntegration();
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddApplicationServices();
+builder.Services.AddApplicationServices()
+    .AddPersistence();
 
 var app = builder.Build();
 

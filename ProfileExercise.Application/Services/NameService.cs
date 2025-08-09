@@ -14,14 +14,10 @@ internal class NameService : INameService
 
     public ProcessedNameDto Process(Name firstName, Name lastName)
     {
+        var reversedFirstName = Reverse(firstName.Value);
+        var reversedLastName = Reverse(lastName.Value);
+
         var originalFull = $"{firstName.Value} {lastName.Value}";
-
-        var reversedFull = Reverse(originalFull);
-
-        var parts = reversedFull.Split(' ', 2);
-        var reversedLastName = parts[0];
-        var reversedFirstName = parts.Length > 1 ? parts[1] : string.Empty;
-
         var countResult = CountLetters(originalFull);
 
         return new ProcessedNameDto(

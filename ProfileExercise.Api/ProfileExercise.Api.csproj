@@ -13,6 +13,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\ProfileExercise.Application\ProfileExercise.Application.csproj"/>
+        <ProjectReference Include="..\ProfileExercise.Persistence\ProfileExercise.Persistence.csproj"/>
+        <ProjectReference Include="..\ProfileExercise.ServiceDefaults\ProfileExercise.ServiceDefaults.csproj"/>
     </ItemGroup>
 
 </Project>

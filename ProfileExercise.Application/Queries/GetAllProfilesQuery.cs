@@ -9,7 +9,7 @@ namespace ProfileExercise.Application.Queries;
 
 public record GetAllProfilesQuery : IRequest<List<ProfileResponseDto>>;
 
-internal sealed class GetAllProfilesQueryHandler(IRepository<Profile> profileRepo, INameService nameService)
+internal sealed class GetAllProfilesQueryHandler(IRepository profileRepo, INameService nameService)
     : IRequestHandler<GetAllProfilesQuery, List<ProfileResponseDto>>
 {
     private readonly DbSet<Profile> _profiles = profileRepo.GetDbSet();
@@ -19,6 +19,7 @@ internal sealed class GetAllProfilesQueryHandler(IRepository<Profile> profileRep
         CancellationToken cancellationToken)
     {
         var profiles = await _profiles
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
 
         var result = profiles
