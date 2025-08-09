@@ -9,7 +9,7 @@ namespace ProfileExercise.Application.Commands;
 
 public record CreateProfileCommand(ProfileDto ProfileDto) : IRequest<ProfileResponseDto>;
 
-internal sealed class CreateProfileCommandHandler(IRepository<Profile> repository, INameService nameService)
+internal sealed class CreateProfileCommandHandler(IRepository repository, INameService nameService)
     : IRequestHandler<CreateProfileCommand, ProfileResponseDto>
 {
     private readonly DbSet<Profile> _profiles = repository.GetDbSet();
@@ -19,7 +19,7 @@ internal sealed class CreateProfileCommandHandler(IRepository<Profile> repositor
         Profile profile = request.ProfileDto;
         _profiles.Add(profile);
 
-        await repository.SaveChangesAsync();
+        await repository.SaveChangesAsync(cancellationToken);
 
         var processedNameDto = nameService.Process(profile.FirstName, profile.LastName);
 
