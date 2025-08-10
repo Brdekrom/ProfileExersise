@@ -48,11 +48,20 @@ public sealed record ProfileDto(
     }
 }
 
-public record SocialSkillDto(
-    string Value
-);
+public record SocialSkillDto(string Value)
+{
+    public static implicit operator SocialSkillDto(SocialSkill domain) =>
+        new(domain.Value);
 
-public record SocialAccountDto(
-    SocialMediaTypes Type,
-    string Address
-);
+    public static implicit operator SocialSkill(SocialSkillDto dto) =>
+        new(dto.Value);
+}
+
+public record SocialAccountDto(SocialMediaTypes Type, string Address)
+{
+    public static implicit operator SocialAccountDto(SocialAccount domain) =>
+        new(domain.SocialMediaType, domain.Address);
+
+    public static implicit operator SocialAccount(SocialAccountDto dto) =>
+        new(dto.Type, dto.Address);
+}

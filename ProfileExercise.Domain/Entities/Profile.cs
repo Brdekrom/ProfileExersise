@@ -5,8 +5,8 @@ namespace ProfileExercise.Domain.Entities;
 
 public sealed class Profile : Entity<Guid>
 {
-    private readonly List<SocialAccount> _socialAccounts = [];
-    private readonly List<SocialSkill> _socialSkills = [];
+    private List<SocialAccount> _socialAccounts = [];
+    private List<SocialSkill> _socialSkills = [];
 
     public Profile(
         Name firstName,
@@ -44,4 +44,18 @@ public sealed class Profile : Entity<Guid>
     public Name LastName { get; private set; }
     public IReadOnlyCollection<SocialSkill> SocialSkills => _socialSkills.AsReadOnly();
     public IReadOnlyCollection<SocialAccount> SocialAccounts => _socialAccounts.AsReadOnly();
+
+    public void Update(Profile requestProfileDto)
+    {
+        FirstName = requestProfileDto.FirstName;
+        LastName = requestProfileDto.LastName;
+
+        _socialSkills = requestProfileDto.SocialSkills
+            .Select(dto => dto)
+            .ToList();
+
+        _socialAccounts = requestProfileDto.SocialAccounts
+            .Select(dto => dto)
+            .ToList();
+    }
 }
