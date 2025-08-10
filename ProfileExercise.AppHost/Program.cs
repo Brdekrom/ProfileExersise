@@ -13,14 +13,14 @@ var db = cosmos.AddCosmosDatabase("exercisedb");
 
 var container = db.AddContainer("profiles", "/id");
 
-var api = builder.AddProject<ProfileExercise_Api>("api")
-    .WithExternalHttpEndpoints()
+var profileapi = builder.AddProject<ProfileExercise_Api>("profileapi")
     .WithReference(db)
-    .WaitFor(db);
+    //.WaitFor(db)
+    .WithExternalHttpEndpoints();
 
 builder.AddNpmApp("angular", "../profile-exercise-angular")
-    .WithReference(api)
-    .WaitFor(api)
+    .WithReference(profileapi)
+    .WaitFor(profileapi)
     .WithHttpEndpoint(env: "PORT")
     .WithExternalHttpEndpoints()
     .PublishAsDockerFile();

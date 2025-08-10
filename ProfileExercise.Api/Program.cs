@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using MediatR;
 using ProfileExercise.Application.Commands;
 using ProfileExercise.Application.DataTransferObjects;
@@ -12,6 +13,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddApplicationServices()
     .AddPersistence();
 
+builder.Services.ConfigureHttpJsonOptions(o => { o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -24,20 +27,20 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapPost("/profiles", async (IMediator mediator, ProfileDto dto) =>
+app.MapPost("/profile", async (IMediator mediator, ProfileDto dto) =>
 {
     var cmd = new CreateProfileCommand(dto);
     ProfileResponseDto result = await mediator.Send(cmd);
     return Results.Created($"/profiles/{result.Profile.Id}", result);
 });
 
-app.MapGet("/profiles", async (IMediator mediator) =>
+app.MapGet("/profile", async (IMediator mediator) =>
 {
     var list = await mediator.Send(new GetAllProfilesQuery());
     return Results.Ok(list);
 });
 
-app.MapGet("/profiles/{id:guid}", async (IMediator mediator, Guid id) =>
+app.MapGet("/profile/{id:guid}", async (IMediator mediator, Guid id) =>
 {
     var query = new GetProfileByIdQuery(id);
     ProfileResponseDto? result = await mediator.Send(query);
