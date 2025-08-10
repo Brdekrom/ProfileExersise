@@ -1,0 +1,51 @@
+<section class="card">
+  <header class="card-header">
+    <h2>Profielen</h2>
+    <span class="spacer"></span>
+    <button class="btn btn-primary" (click)="create()">+ Nieuw profiel</button>
+  </header>
+
+  <div class="card-body">
+    @if (vm$ | async; as vm) {
+      @if (vm.loading) {
+        <div class="center">
+          <div class="spinner"></div>
+        </div>
+      }
+
+      @if (vm.error) {
+        <div class="alert error">
+          {{ vm.error }}
+        </div>
+      }
+
+      @if (!vm.loading && !vm.error) {
+        <table class="fullwidth">
+          <thead>
+            <tr>
+              <th>Voornaam</th>
+              <th>Achternaam</th>
+              <th>Skills</th>
+              <th>Accounts</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of vm.profiles; track trackById($index, p)) {
+              <tr (click)="open(p)" class="row-hover">
+                <td>{{ p.firstName }}</td>
+                <td>{{ p.lastName }}</td>
+                <td>{{ getSocialSkillsString(p) }}</td>
+                <td>{{ p.socialAccounts?.length || '—' }}</td>
+                <td class="actions">
+                  <button class="btn btn-secondary" (click)="open(p); $event.stopPropagation()">Bekijken</button>
+                  <button class="btn btn-danger" (click)="delete(p, $event)">Verwijderen</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    }
+  </div>
+</section>

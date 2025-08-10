@@ -1,1 +1,11 @@
-<app-profile-edit></app-profile-edit>
+<!-- src/app/app.component.html -->
+<mat-toolbar color="primary">
+  <span>Profiles</span>
+  <span style="flex:1 1 auto"></span>
+  <a mat-button routerLink="/profiles" routerLinkActive="active">Lijst</a>
+  <a mat-raised-button color="accent" routerLink="/profiles/new">Nieuw</a>
+</mat-toolbar>
+
+<main style="padding:16px;">
+  <router-outlet></router-outlet>
+</main>

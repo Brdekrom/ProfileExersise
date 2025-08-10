@@ -5,7 +5,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
-        <RootNamespace>ProfileExercise.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,10 +16,6 @@
 
     <ItemGroup>
         <Using Include="Xunit"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\ProfileExercise.Domain\ProfileExercise.Domain.csproj"/>
     </ItemGroup>
 
 </Project>

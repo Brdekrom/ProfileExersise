@@ -1,10 +1,12 @@
 import { Component, signal } from '@angular/core';
-import { ProfileEditComponent } from './profile/profile-edit.component/profile-edit.component';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ProfileEditComponent],
+  imports: [RouterLink, RouterLinkActive, MatButtonModule, MatToolbarModule, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.sass'
 })

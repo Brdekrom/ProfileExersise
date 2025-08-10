@@ -1,0 +1,73 @@
+@if (error) {
+  <div class="alert error">
+    <strong>Fout:</strong> {{ error?.message }}
+    @if (error?.status) { <span>(Status: {{ error.status }})</span> }
+  </div>
+}
+
+@if (saved) {
+  <div class="alert success">
+    Profiel succesvol opgeslagen.
+  </div>
+}
+
+@if (profile && processedName) {
+  <section class="panel">
+    <h3>Naam-analyse</h3>
+    <div>
+      <div>Aantal Klinkers: {{ processedName.vowelCount }}</div>
+      <div>Aantal Medeklinkers: {{ processedName.consonantCount }}</div>
+
+      <div>Voornaam + achternaam: {{profile.firstName}} {{profile.lastName}}</div>
+      <div>Omgekeerde versie van voor en achternaam  {{ processedName.reversedFirstName }} {{ processedName.reversedLastName }}</div>
+      <h3>The Json format of the entire object: </h3>
+    <pre>{{ profile | json }}</pre>
+    </div>
+  </section>
+}
+
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <label>Voornaam</label>
+  <input formControlName="firstName" />
+  @if (form.controls.firstName.touched && form.controls.firstName.invalid) {
+    <small>Voornaam is verplicht</small>
+  }
+
+  <label>Achternaam</label>
+  <input formControlName="lastName" />
+  @if (form.controls.lastName.touched && form.controls.lastName.invalid) {
+    <small>Achternaam is verplicht</small>
+  }
+
+  <h3>Social Skills</h3>
+  <div formArrayName="socialSkills">
+    @for (ctrl of socialSkills.controls; track $index) {
+      <div>
+        <input [formControlName]="$index" placeholder="Skill" />
+        <button type="button" (click)="removeSkill($index)">Verwijder</button>
+      </div>
+    }
+    <button type="button" (click)="addSkill()">Skill toevoegen</button>
+  </div>
+
+  <h3>Social Accounts</h3>
+  <div formArrayName="socialAccounts">
+    @for (grp of socialAccounts.controls; track $index) {
+      <div [formGroupName]="$index">
+        <select formControlName="type">
+          @for (t of mediaTypes; track $index) {
+            <option [value]="t">{{ SocialMediaTypes[t] }}</option>
+          }
+        </select>
+        <input formControlName="address" placeholder="Adres" />
+        <button type="button" (click)="removeAccount($index)">Verwijder</button>
+      </div>
+    }
+    <button type="button" (click)="addAccount()">Account toevoegen</button>
+  </div>
+
+  <button type="submit" [disabled]="form.pending || form.invalid || saving">
+    @if (saving) { Opslaan… } @else { Opslaan }
+  </button>
+</form>
