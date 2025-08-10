@@ -97,7 +97,7 @@ public sealed class SocialAccount : ValueObject
     private static void ValidateUrl(string address, string requiredSegment, string errorMessage)
     {
         if (string.IsNullOrWhiteSpace(address) ||
-            !Uri.TryCreate(address, UriKind.Absolute, out var uri) ||
+            !Uri.TryCreate(address, UriKind.RelativeOrAbsolute, out var uri) ||
             !uri.AbsoluteUri.Contains(requiredSegment, StringComparison.OrdinalIgnoreCase))
         {
             throw new ArgumentException(errorMessage, nameof(address));
