@@ -1,8 +1,10 @@
 import { Component, signal } from '@angular/core';
+import { ProfileEditComponent } from './profile/profile-edit.component/profile-edit.component';
 
 @Component({
   selector: 'app-root',
-  imports: [],
+  standalone: true,
+  imports: [ProfileEditComponent],
   templateUrl: './app.html',
   styleUrl: './app.sass'
 })
