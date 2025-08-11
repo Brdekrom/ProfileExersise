@@ -1,12 +1,8 @@
+using ProfileExercise.Application.Abstractions;
 using ProfileExercise.Application.DataTransferObjects;
 using ProfileExercise.Domain.ValueObjects;
 
 namespace ProfileExercise.Application.Services;
-
-public interface INameService
-{
-    ProcessedNameDto Process(Name firstName, Name lastName);
-}
 
 internal class NameService : INameService
 {

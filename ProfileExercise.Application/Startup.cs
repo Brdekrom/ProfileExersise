@@ -1,4 +1,5 @@
-﻿using ProfileExercise.Application.Services;
+﻿using ProfileExercise.Application.Abstractions;
+using ProfileExercise.Application.Services;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
