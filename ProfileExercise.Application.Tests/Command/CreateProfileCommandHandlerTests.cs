@@ -26,7 +26,7 @@ public sealed class CreateProfileCommandHandlerTests
         await using var db = new TestDbContext(options);
         var repo = new FakeRepository(db);
 
-        var nameService = new Mock<INameService>();
+        var nameService = new Mock<IAnalyzer>();
         var processed = new ProcessedNameDto(4, 6, "ecilA", "htimS");
 
         nameService
@@ -85,7 +85,7 @@ public sealed class CreateProfileCommandHandlerTests
         await using var db = new TestDbContext(options);
         var repo = new FakeRepository(db);
 
-        var nameService = new Mock<INameService>();
+        var nameService = new Mock<IAnalyzer>();
         nameService
             .Setup(s => s.Process(It.IsAny<Name>(), It.IsAny<Name>()))
             .Returns(new ProcessedNameDto(3, 4, "nhoJ", "eoD"));

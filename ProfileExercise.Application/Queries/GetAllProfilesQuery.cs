@@ -2,14 +2,13 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using ProfileExercise.Application.Abstractions;
 using ProfileExercise.Application.DataTransferObjects;
-using ProfileExercise.Application.Services;
 using ProfileExercise.Domain.Entities;
 
 namespace ProfileExercise.Application.Queries;
 
 public record GetAllProfilesQuery : IRequest<List<ProfileResponseDto>>;
 
-internal sealed class GetAllProfilesQueryHandler(IRepository profileRepo, INameService nameService)
+internal sealed class GetAllProfilesQueryHandler(IRepository profileRepo, IAnalyzer analyzer)
     : IRequestHandler<GetAllProfilesQuery, List<ProfileResponseDto>>
 {
     private readonly DbSet<Profile> _profiles = profileRepo.GetDbSet();
@@ -25,7 +24,7 @@ internal sealed class GetAllProfilesQueryHandler(IRepository profileRepo, INameS
         var result = profiles
             .Select(p =>
             {
-                var processedNameDto = nameService.Process(p.FirstName, p.LastName);
+                var processedNameDto = analyzer.Process(p.FirstName, p.LastName);
                 return new ProfileResponseDto(p, processedNameDto);
             })
             .ToList();

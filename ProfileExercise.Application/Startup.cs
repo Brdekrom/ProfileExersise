@@ -7,7 +7,7 @@ public static class Startup
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        services.AddTransient<INameService, NameService>();
+        services.AddTransient<IAnalyzer, FullNameProcessor>();
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Startup).Assembly));
         return services;
     }

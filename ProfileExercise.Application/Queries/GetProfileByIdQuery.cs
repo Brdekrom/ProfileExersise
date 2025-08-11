@@ -2,14 +2,13 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using ProfileExercise.Application.Abstractions;
 using ProfileExercise.Application.DataTransferObjects;
-using ProfileExercise.Application.Services;
 using ProfileExercise.Domain.Entities;
 
 namespace ProfileExercise.Application.Queries;
 
 public record GetProfileByIdQuery(Guid ProfileId) : IRequest<ProfileResponseDto>;
 
-internal sealed class GetProfileByIdQueryHandler(IRepository profileRepo, INameService nameService)
+internal sealed class GetProfileByIdQueryHandler(IRepository profileRepo, IAnalyzer analyzer)
     : IRequestHandler<GetProfileByIdQuery, ProfileResponseDto>
 {
     private readonly DbSet<Profile> _profiles = profileRepo.GetDbSet();
@@ -24,7 +23,7 @@ internal sealed class GetProfileByIdQueryHandler(IRepository profileRepo, INameS
             throw new KeyNotFoundException(
                 $"Profile with Id '{request.ProfileId}' not found.");
 
-        var processed = nameService.Process(profile.FirstName, profile.LastName);
+        var processed = analyzer.Process(profile.FirstName, profile.LastName);
 
         var dto = new ProfileResponseDto(
             profile,

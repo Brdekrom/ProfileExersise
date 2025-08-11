@@ -22,10 +22,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Query\"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\ProfileExercise.Application\ProfileExercise.Application.csproj"/>
     </ItemGroup>
 

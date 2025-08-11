@@ -4,7 +4,7 @@ using ProfileExercise.Domain.ValueObjects;
 
 namespace ProfileExercise.Application.Services;
 
-internal class NameService : INameService
+internal class FullNameProcessor : IAnalyzer
 {
     private static readonly HashSet<char> Vowels = new() { 'a', 'e', 'i', 'o', 'u' };
 

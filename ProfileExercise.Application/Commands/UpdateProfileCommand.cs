@@ -2,14 +2,13 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using ProfileExercise.Application.Abstractions;
 using ProfileExercise.Application.DataTransferObjects;
-using ProfileExercise.Application.Services;
 using ProfileExercise.Domain.Entities;
 
 namespace ProfileExercise.Application.Commands;
 
 public record UpdateProfileCommand(ProfileDto ProfileDto) : IRequest<ProfileResponseDto>;
 
-internal sealed class UpdateProfileCommandHandler(IRepository repository, INameService nameService)
+internal sealed class UpdateProfileCommandHandler(IRepository repository, IAnalyzer analyzer)
     : IRequestHandler<UpdateProfileCommand, ProfileResponseDto>
 {
     private readonly DbSet<Profile> _profiles = repository.GetDbSet();
@@ -27,7 +26,7 @@ internal sealed class UpdateProfileCommandHandler(IRepository repository, INameS
 
         await repository.SaveChangesAsync(cancellationToken);
 
-        var processedNameDto = nameService.Process(profile.FirstName, profile.LastName);
+        var processedNameDto = analyzer.Process(profile.FirstName, profile.LastName);
 
         return new ProfileResponseDto(profile, processedNameDto);
     }
