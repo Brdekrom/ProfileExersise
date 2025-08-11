@@ -3,11 +3,22 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, EMPTY, finalize, map, Observable, switchMap, tap } from 'rxjs';
+import {
+  catchError,
+  EMPTY,
+  finalize,
+  map,
+  Observable,
+  switchMap,
+  tap,
+} from 'rxjs';
 
 import { ProfileForm } from '../../models/profile-form.types';
 import { Profile, SocialMediaTypes } from '../../models/profile.model';
-import { ProcessedName, ProfileResponse } from '../../models/profile-response.model';
+import {
+  ProcessedName,
+  ProfileResponse,
+} from '../../models/profile-response.model';
 
 import { ProfileFormService } from '../../services/profile-form.service';
 import { ProfileHttpService } from '../../services/profile-http.service';
@@ -17,13 +28,16 @@ import { ProfileHttpService } from '../../services/profile-http.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './profile-edit.component.html',
-  styleUrls: ['./profile-edit.component.sass']
+  styleUrls: ['./profile-edit.component.sass'],
 })
 export class ProfileEditComponent implements OnInit {
   form!: ProfileForm;
 
   readonly SocialMediaTypes = SocialMediaTypes;
-  mediaTypes = Object.values(SocialMediaTypes).filter(v => typeof v === 'number') as number[];
+
+  mediaTypes = Object.values(SocialMediaTypes).filter(
+    (typeValue) => typeof typeValue === 'number'
+  ) as number[];
 
   saving = false;
   saved = false;
@@ -33,14 +47,14 @@ export class ProfileEditComponent implements OnInit {
   processedName: ProcessedName | null = null;
 
   constructor(
-    private formSvc: ProfileFormService,
+    private formService: ProfileFormService,
     private profileClient: ProfileHttpService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.form = this.formSvc.createProfileForm();
+    this.form = this.formService.createProfileForm();
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -48,78 +62,106 @@ export class ProfileEditComponent implements OnInit {
     }
   }
 
-  /** Slurpt zowel ProfileResponse als kale Profile op en normaliseert casing. */
-  private unwrapAndNormalize = (dto: any): { profile: Profile; processedName: ProcessedName | null } => {
-    const raw = dto?.profile ?? dto; // als het ProfileResponse is -> neem .profile, anders dto zelf
+  private unwrapAndNormalize = (
+    dto: ProfileResponse
+  ): { profile: Profile; processedName: ProcessedName | null } => {
+    const raw = dto?.profile ?? dto;
 
     const normalized: Profile = {
-      id: raw?.id ?? raw?.Id ?? '',
-      firstName: raw?.firstName ?? raw?.FirstName ?? '',
-      lastName: raw?.lastName ?? raw?.LastName ?? '',
-      socialSkills: (raw?.socialSkills ?? raw?.SocialSkills ?? []).map((s: any) => ({
-        value: s?.value ?? s?.Value ?? ''
+      id: raw?.id ?? '',
+      firstName: raw?.firstName ?? '',
+      lastName: raw?.lastName ?? '',
+      socialSkills: (raw?.socialSkills ?? []).map((s: any) => ({
+        value: s?.value ?? s?.Value ?? '',
       })),
-      socialAccounts: (raw?.socialAccounts ?? raw?.SocialAccounts ?? []).map((a: any) => ({
+      socialAccounts: (raw?.socialAccounts ?? []).map((a: any) => ({
         type: a?.type ?? a?.Type ?? 0,
-        address: a?.address ?? a?.Address ?? ''
-      }))
+        address: a?.address ?? a?.Address ?? '',
+      })),
     };
 
-    const pn: ProcessedName | null = dto?.processedName ?? dto?.ProcessedName ?? null;
+    const pn: ProcessedName | null =
+      dto?.processedName ?? dto?.processedName ?? null;
     return { profile: normalized, processedName: pn };
   };
 
   private loadForEdit(id: string): void {
     this.saving = true;
-    this.profileClient.getProfile(id).pipe(
-      map(res => this.unwrapAndNormalize(res)),
-      finalize(() => (this.saving = false))
-    ).subscribe({
-      next: ({ profile, processedName }) => {
-        this.profile = profile;
-        this.processedName = processedName; // kan null zijn, is oké
-        this.formSvc.patchProfileForm(this.form, profile);
-      },
-      error: _ => {
-        this.error = { message: 'Profile laden mislukt' };
-      }
-    });
+    this.profileClient
+      .getProfile(id)
+      .pipe(
+        map((res) => this.unwrapAndNormalize(res)),
+        finalize(() => (this.saving = false))
+      )
+      .subscribe({
+        next: ({ profile, processedName }) => {
+          this.profile = profile;
+          this.processedName = processedName;
+          this.formService.patchProfileForm(this.form, profile);
+        },
+        error: (_) => {
+          this.error = { message: 'Profile laden mislukt' };
+        },
+      });
   }
 
-  get socialSkills() { return this.form.controls.socialSkills; }
-  get socialAccounts() { return this.form.controls.socialAccounts; }
+  get socialSkills() {
+    return this.form.controls.socialSkills;
+  }
+  get socialAccounts() {
+    return this.form.controls.socialAccounts;
+  }
 
-  addSkill() { this.socialSkills.push(this.formSvc.createSocialSkillControl()); }
-  removeSkill(i: number) { this.socialSkills.removeAt(i); }
+  addSkill() {
+    this.socialSkills.push(this.formService.createSocialSkillControl());
+  }
+  removeSkill(i: number) {
+    this.socialSkills.removeAt(i);
+  }
 
-  addAccount() { this.socialAccounts.push(this.formSvc.createSocialAccountGroup()); }
-  removeAccount(i: number) { this.socialAccounts.removeAt(i); }
+  addAccount() {
+    this.socialAccounts.push(this.formService.createSocialAccountGroup());
+  }
+  removeAccount(i: number) {
+    this.socialAccounts.removeAt(i);
+  }
 
   private buildPayload(): Profile {
     const raw = this.form.getRawValue();
     return {
       ...raw,
-      socialSkills: raw.socialSkills.map(value => ({ value })),
-      socialAccounts: raw.socialAccounts
+      socialSkills: raw.socialSkills.map((value) => ({ value })),
+      socialAccounts: raw.socialAccounts,
     };
   }
 
-  /** create -> ProfileResponse; update -> Profile (meestal 200/204). We normaliseren het resultaat. */
-  private upsert$(payload: Profile): Observable<{ profile: Profile; processedName: ProcessedName | null; created: boolean }> {
+  private upsert$(payload: Profile): Observable<{
+    profile: Profile;
+    processedName: ProcessedName | null;
+    created: boolean;
+  }> {
     const id = payload.id?.trim();
     if (id) {
       return this.profileClient.updateProfile(id, payload).pipe(
         switchMap(() => this.profileClient.getProfile(id)),
-        map(res => {
+        map((res) => {
           const unwrapped = this.unwrapAndNormalize(res);
-          return { profile: unwrapped.profile, processedName: null, created: false };
+          return {
+            profile: unwrapped.profile,
+            processedName: null,
+            created: false,
+          };
         })
       );
     } else {
       return this.profileClient.createProfile(payload).pipe(
         map((res: ProfileResponse) => {
           const unwrapped = this.unwrapAndNormalize(res);
-          return { profile: unwrapped.profile, processedName: unwrapped.processedName, created: true };
+          return {
+            profile: unwrapped.profile,
+            processedName: unwrapped.processedName,
+            created: true,
+          };
         })
       );
     }
@@ -138,30 +180,33 @@ export class ProfileEditComponent implements OnInit {
 
     const payload = this.buildPayload();
 
-    this.upsert$(payload).pipe(
-      tap(({ profile, processedName, created }) => {
-        this.profile = profile;
-        this.processedName = processedName;
-        this.saved = true;
+    this.upsert$(payload)
+      .pipe(
+        tap(({ profile, processedName, created }) => {
+          this.profile = profile;
+          this.processedName = processedName;
+          this.saved = true;
 
-        if (created && profile?.id) {
-          this.router.navigate(['/profiles', profile.id], { replaceUrl: true });
-        } else {
-          this.formSvc.patchProfileForm(this.form, profile);
-        }
-      }),
-      catchError((err: HttpErrorResponse) => {
-        this.handleHttpError(err);
-        return EMPTY;
-      }),
-      finalize(() => (this.saving = false))
-    ).subscribe();
+          if (created && profile?.id) {
+            this.router.navigate(['/profiles'], { replaceUrl: true });
+          } else {
+            this.formService.patchProfileForm(this.form, profile);
+            this.router.navigate(['/profiles'], { replaceUrl: true });
+          }
+        }),
+        catchError((err: HttpErrorResponse) => {
+          this.handleHttpError(err);
+          return EMPTY;
+        }),
+        finalize(() => (this.saving = false))
+      )
+      .subscribe();
   }
 
   private handleHttpError(err: HttpErrorResponse): void {
     this.error = {
       status: err.status,
-      message: err.error?.title || err.message || 'Opslaan mislukt'
+      message: err.error?.title || err.message || 'Opslaan mislukt',
     };
   }
 }

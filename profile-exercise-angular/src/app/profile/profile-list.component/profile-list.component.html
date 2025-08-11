@@ -6,20 +6,20 @@
   </header>
 
   <div class="card-body">
-    @if (vm$ | async; as vm) {
-      @if (vm.loading) {
+    @if (profilesVm$ | async; as profilesVm) {
+      @if (profilesVm.loading) {
         <div class="center">
           <div class="spinner"></div>
         </div>
       }
 
-      @if (vm.error) {
+      @if (profilesVm.error) {
         <div class="alert error">
-          {{ vm.error }}
+          {{ profilesVm.error }}
         </div>
       }
 
-      @if (!vm.loading && !vm.error) {
+      @if (!profilesVm.loading && !profilesVm.error) {
         <table class="fullwidth">
           <thead>
             <tr>
@@ -31,12 +31,12 @@
             </tr>
           </thead>
           <tbody>
-            @for (p of vm.profiles; track trackById($index, p)) {
+            @for (p of profilesVm.profiles; track trackById($index, p)) {
               <tr (click)="open(p)" class="row-hover">
                 <td>{{ p.firstName }}</td>
                 <td>{{ p.lastName }}</td>
                 <td>{{ getSocialSkillsString(p) }}</td>
-                <td>{{ p.socialAccounts?.length || '—' }}</td>
+                <td>{{ p.socialAccounts?.length || '/' }}</td>
                 <td class="actions">
                   <button class="btn btn-secondary" (click)="open(p); $event.stopPropagation()">Bekijken</button>
                   <button class="btn btn-danger" (click)="delete(p, $event)">Verwijderen</button>

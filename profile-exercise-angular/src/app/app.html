@@ -1,11 +1,11 @@
 <!-- src/app/app.component.html -->
-<mat-toolbar color="primary">
+<header class="toolbar">
   <span>Profiles</span>
-  <span style="flex:1 1 auto"></span>
-  <a mat-button routerLink="/profiles" routerLinkActive="active">Lijst</a>
-  <a mat-raised-button color="accent" routerLink="/profiles/new">Nieuw</a>
-</mat-toolbar>
+  <span class="spacer"></span>
+  <a class="btn" routerLink="/profiles" routerLinkActive="active">Lijst</a>
+  <a class="btn btn-accent" routerLink="/profiles/new">Nieuw</a>
+</header>
 
-<main style="padding:16px;">
+<main class="content">
   <router-outlet></router-outlet>
 </main>

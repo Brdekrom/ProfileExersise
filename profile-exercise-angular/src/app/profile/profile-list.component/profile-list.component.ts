@@ -6,7 +6,6 @@ import { Observable, of, switchMap, map, catchError, startWith } from 'rxjs';
 import { Profile } from '../../models/profile.model';
 import { ProfileHttpService } from '../../services/profile-http.service';
 
-/** ViewModel voor de template */
 type Vm = {
   loading: boolean;
   error: string | null;
@@ -24,10 +23,10 @@ export class ProfileListComponent implements OnInit {
   private api = inject(ProfileHttpService);
   private router = inject(Router);
 
-  vm$!: Observable<Vm>;
+  profilesVm$!: Observable<Vm>;
 
   ngOnInit(): void {
-    this.vm$ = this.loadVm$();
+    this.profilesVm$ = this.loadProfilesVm$();
   }
 
   private normalizeProfile = (dto: any): Profile => ({
@@ -43,13 +42,12 @@ export class ProfileListComponent implements OnInit {
     })),
   });
 
-  private loadVm$(): Observable<Vm> {
+  private loadProfilesVm$(): Observable<Vm> {
     return of(null).pipe(
       switchMap(() =>
         this.api.getProfiles().pipe(
-          // unwrap: ProfileResponse[] -> Profile[]
           map(responses => (responses ?? []).map(r => {
-            const rawProfile = r?.profile ?? r?.profile ?? r; // fallback just-in-case
+            const rawProfile = r?.profile ?? r?.profile ?? r;
             return this.normalizeProfile(rawProfile);
           })),
           map(list => ({ loading: false, error: null, profiles: list } as Vm)),
@@ -60,7 +58,6 @@ export class ProfileListComponent implements OnInit {
     );
   }
 
-  /** Actions */
   create(): void {
     this.router.navigate(['/profiles/new']);
   }
@@ -80,15 +77,13 @@ export class ProfileListComponent implements OnInit {
     this.api.deleteProfile(p.id).subscribe({
       next: () => {
         alert('✅ Verwijderd');
-        // reload vm
-        this.vm$ = this.loadVm$();
+        this.profilesVm$ = this.loadProfilesVm$();
       },
       error: () => alert('❌ Verwijderen mislukt'),
     });
   }
 
   trackById(index: number, p: Profile): string {
-    // Fallback om NG0955 te voorkomen als id ontbreekt
     return p.id?.trim() || `idx-${index}`;
   }
 
